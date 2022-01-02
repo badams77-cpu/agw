@@ -1,0 +1,41 @@
+public class Constants {
+
+    public static double PLANCKS = 6.626d-34;
+    public static double BOLTZMANN = 1.38649d-23;
+    public static double SPEED_OF_LIGHT = 299792458.0;
+    public static double SOLAR = 1360.8;
+    public static double WITTEMAN_WIDTH = 5.53;
+    public static double PASCAL_TO_TORR = 0.0075006168;
+    public static double EARTH_GRAV = 9.80665;
+    public static double AIR_MASS = 0.0289644;
+    public static double GAS_CONSTANT = 8.3144598;
+    public static double SPEED_OF_LIGHT_CM = SPEED_OF_LIGHT * 100;
+    public static double LINE1_CO2_WN = 2349.91;
+    public static double LINE1_C02_EINSTEIN_A = 140.7;
+    public static double LINE1_CO2_WIDTH = 0.0949;
+    public static double LINE1_CO2_MULTIPLICITY = 3;
+    public static double LINE2_CO2_WN = 686.16;
+    public static double LINE2_CO2_EINSTEIN_A = 1.023;
+    public static double LINE2_CO2_WIDTH = 0.0949;
+    public static double LINE2_CO2_MULTIPLICITY = 3;
+    public static double LINE3_CO2_WN = 3716.56;
+    public static double LINE3_CO2_EINSTEIN_A = 3716.56;
+    public static double LINE3_CO2_WIDTH = 0.0949;
+    public static double LINE3_CO2_MULTIPLICITY = 3;
+    public static double LINE1_H20_WN = 1634.96;
+    public static double LINE1_H20_EINSTEIN_A = 7.599;
+    public static double LINE1_H20_WIDTH = 0.1026;
+    public static double LINE1_H20_MULTIPLICITY = 3;
+    public static double LINE2_H20_WN = 3693.29;
+    public static double LINE2_H20_EINSTEIN_A = 1.031;
+    public static double LINE2_H20_WIDTH = 0.1049;
+    public static double LINE2_H20_MULTIPLICITY = 3;
+    public static double LINE3_H20_WN = 3196.09;
+    public static double LINE3_H20_EINSTEIN_A = 0.1982;
+    public static double LINE3_H20_WIDTH = 0.1038;
+    public static double LINE3_H20_MULTIPLICITY = 3;
+    public static double LINE4_H20_WN = 1601.34;
+    public static double LINE4_H20_EINSTEIN_A = 14.79;
+    public static double LINE4_H20_WIDTH = 0.0965;
+    public static double LINE4_H20_MULTIPLICITY = 3;
+}
