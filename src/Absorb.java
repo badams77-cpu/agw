@@ -36,8 +36,8 @@ public class Absorb {
         double temp = 296.0;
         double width = LineWidth.halfwidth(pressure, temp, nair, gammaair);
         double freq1 = WN*Constants.SPEED_OF_LIGHT_CM;
-        double cross = LorentzAbsorb.sigma(freq, freq1, width);
-        return  Constants.SPEED_OF_LIGHT*g*Constants.SPEED_OF_LIGHT*A*cross/ (8*Math.PI*width * freq * freq * freq);
+        double phi = LorentzAbsorb.sigma(freq, freq1, width);
+        return  Constants.SPEED_OF_LIGHT*g*Constants.SPEED_OF_LIGHT*A*phi/ (8*Math.PI*width * freq * freq * freq);
     }
 
 
