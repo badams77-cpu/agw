@@ -45,4 +45,9 @@ public class Constants {
     public static double LINE4_H20_WIDTH = 0.0965;
     public static double LINE4_H20_MULTIPLICITY = 3;
     public static double LINE4_H20_NAIR = 0.61;
+    public static double AIR_INTERNAL_ENERGY_PER_KT = 5.0/2.0;
+    public static double AVOGADRO_NUMBER = 6.02214e23;
+    public static double RADIUS_EARTH = 6371000.0;
+    public static double ACCELERATION_DUE_TO_GRAVITY = 9.80665;
+    public static double AIR_MOLAR_MASS = 28.97;
 }
