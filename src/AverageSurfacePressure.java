@@ -2,26 +2,11 @@ import java.io.PrintWriter;
 
 public class AverageSurfacePressure {
 
-    private TempPoint[] inputTable = {
-            new TempPoint(-90,-20.0),
-            new TempPoint(-80, -15.0),
-            new TempPoint(-70, -8.0),
-            new TempPoint(-60, -1.0),
-            new TempPoint(-50, 10),
-            new TempPoint(-40, 16),
-            new TempPoint( -30, 20),
-            new TempPoint( -20, 24),
-            new TempPoint( -10, 26),
-            new TempPoint( 0, 27),
-            new TempPoint( 10, 27),
-            new TempPoint(20, 25),
-            new TempPoint(30,20),
-            new TempPoint(40, 17),
-            new TempPoint(50,7),
-            new TempPoint(60,-1),
-            new TempPoint(70, -8),
-            new TempPoint(80, -15),
-            new TempPoint(90, -17)
+
+    // For now we code constant pressure, but the table can take varying Pressure by Latitude
+    private PressPoint[] inputTable = {
+        new PressPoint(-90, 101325),
+        new PressPoint(90, 101325)
     };
 
     public double pressureAtLatitude(double lat){
@@ -31,7 +16,7 @@ public class AverageSurfacePressure {
         double rightTemp = 0;
         for(int i=0; i<inputTable.length; i++){
             int tabLat = inputTable[i].lat;
-            double tabTemp = inputTable[i].temp;
+            double tabTemp = inputTable[i].pressure;
             if (tabLat<=lat){
                 leftTemp = tabTemp;
                 leftLat= tabLat;
@@ -61,11 +46,11 @@ public class AverageSurfacePressure {
 class PressPoint {
 
     int lat;
-    double temp;
+    double pressure;
 
     public PressPoint(int lat, double temp){
         this.lat = lat;
-        this.temp = temp;
+        this.pressure = pressure;
     }
 
 }

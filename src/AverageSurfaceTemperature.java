@@ -44,7 +44,7 @@ public class AverageSurfaceTemperature {
         }
         double ret1 = leftTemp + (rightTemp-leftTemp) * (lat-leftLat)/(rightLat-leftLat);
         double ret2 = rightTemp - (rightTemp-leftTemp) * (rightLat-lat)/ (rightLat-leftLat);
-        return 0.5*(ret1+ret2);
+        return 0.5*(ret1+ret2)+273.15;
     }
 
     public static void main(String[] argv){
