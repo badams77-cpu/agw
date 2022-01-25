@@ -102,7 +102,7 @@ public class AGW {
 
             @Override
             double evalInner(double x, double[] params) {
-                double lat = params[0];
+                double lat = x*90/Math.PI;
                 double P0 = asp.pressureAtLatitude(lat);
                 double T0 = ast.tempAtLatitude(lat);
                 totalAbsorbOverFreqC02.setParams( P0, T0);
@@ -114,7 +114,7 @@ public class AGW {
 
             @Override
             double evalInner(double x, double[] params) {
-                double lat = params[0]*90/Math.PI;
+                double lat = x*90/Math.PI;
                 double P0 = asp.pressureAtLatitude(lat);
                 double T0 = ast.tempAtLatitude(lat);
                 totalAbsorbOverFreqH20.setParams( P0, T0);
