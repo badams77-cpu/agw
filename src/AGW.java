@@ -45,7 +45,7 @@ public class AGW {
                 double T0 = params[2];
                 double groundintensity = params[3];
                 double P = BarometricFormula.pressureByHeight(P0, T0, height);
-                double T = BarometricFormula.tempByHeight(T0, height);
+//                double T = BarometricFormula.tempByHeight(T0, height);
                 double concC02 = P*CO2CONC;
                 double absorb = groundintensity*Absorb.absorbH02(concC02, freq, height , (double) heightStep );
                 return absorb;
@@ -68,7 +68,7 @@ public class AGW {
                 double T0 = params[1];
                 double intensity = PlanckLaw.planck(freq, T0);
                 innerMostH20.setParams(freq, P0, T0, intensity);
-                return SimpsonsRule.integrate(0, maxHeight, NheightStep, innerMostC20);
+                return SimpsonsRule.integrate(0, maxHeight, NheightStep, innerMostH20);
             }
         };
 

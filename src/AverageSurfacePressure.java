@@ -5,30 +5,30 @@ public class AverageSurfacePressure {
 
     // For now we code constant pressure, but the table can take varying Pressure by Latitude
     private PressPoint[] inputTable = {
-        new PressPoint(-90, 101325),
-        new PressPoint(90, 101325)
+        new PressPoint(-90.0, 101325),
+        new PressPoint(90.0, 101325)
     };
 
     public double pressureAtLatitude(double lat){
-        int leftLat=100;
-        double leftTemp=0;
-        int rightLat = -100;
-        double rightTemp = 0;
+        double leftLat=100;
+        double leftPressure=0;
+        double rightLat = -100;
+        double rightPressure = 0;
         for(int i=0; i<inputTable.length; i++){
-            int tabLat = inputTable[i].lat;
-            double tabTemp = inputTable[i].pressure;
+            double tabLat = inputTable[i].lat;
+            double tabPressure = inputTable[i].pressure;
             if (tabLat<=lat){
-                leftTemp = tabTemp;
+                leftPressure = tabPressure;
                 leftLat= tabLat;
             }
             if (tabLat>lat){
-                rightTemp = tabTemp;
+                rightPressure = tabPressure;
                 rightLat = tabLat;
                 break;
             }
         }
-        double ret1 = leftTemp + (rightTemp-leftTemp) * (lat-leftLat)/(rightLat-leftLat);
-        double ret2 = rightTemp - (rightTemp-leftTemp) * (rightLat-lat)/ (rightLat-leftLat);
+        double ret1 = leftPressure + (rightPressure-leftPressure) * (lat-leftLat)/(rightLat-leftLat);
+        double ret2 = rightPressure - (rightPressure-leftPressure) * (rightLat-lat)/ (rightLat-leftLat);
         return 0.5*(ret1+ret2);
     }
 
@@ -45,10 +45,10 @@ public class AverageSurfacePressure {
 
 class PressPoint {
 
-    int lat;
+    double lat;
     double pressure;
 
-    public PressPoint(int lat, double temp){
+    public PressPoint(double lat, double pressure){
         this.lat = lat;
         this.pressure = pressure;
     }
