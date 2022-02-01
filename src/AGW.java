@@ -47,7 +47,7 @@ public class AGW {
                 double P = BarometricFormula.pressureByHeight(P0, T0, height);
 //                double T = BarometricFormula.tempByHeight(T0, height);
                 double concC02 = P*CO2CONC;
-                double absorb = groundintensity*Absorb.absorbH02(concC02, freq, height , (double) heightStep );
+                double absorb = groundintensity*Absorb.absorbC02(concC02, freq, height , (double) heightStep );
                 return absorb;
             }
         };
