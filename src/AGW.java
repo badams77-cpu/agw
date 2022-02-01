@@ -3,7 +3,7 @@ import java.util.function.DoubleFunction;
 public class AGW {
 
     static int heightStep = 100;
-    static int maxHeight = 30000;
+    static int maxHeight = 25000;
     static int NheightStep = maxHeight/heightStep;
     static int latitudeSteps = 100;
     double freqNum;

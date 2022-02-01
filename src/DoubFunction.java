@@ -1,5 +1,4 @@
-public abstract
-class DoubFunction {
+public abstract class DoubFunction {
 
     private double[] extraParams;
 
