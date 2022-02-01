@@ -7,9 +7,9 @@ public class AGW {
     static int NheightStep = maxHeight/heightStep;
     static int latitudeSteps = 100;
     double freqNum;
-    static double freqMax = 1e15 ;
-    static double freqMin = 2e13;
-    static int freqSteps = 100;
+    static double freqMax = 1e14 ;
+    static double freqMin = 2e11;
+    static int freqSteps = 1000;
 
 
     public static double CO2CONC = 400/1000000;

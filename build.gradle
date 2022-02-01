@@ -1,0 +1,26 @@
+plugins {
+    id 'application'
+}
+
+group 'com.axialforcegames.agw'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+application {
+    mainClass = 'AGW'
+}
+
+sourceSets{
+    main {
+        java {
+            srcDir 'src'
+        }
+    }
+}
+
+dependencies {
+    testImplementation 'junit:junit:4.12'
+}
