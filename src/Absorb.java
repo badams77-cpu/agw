@@ -7,7 +7,7 @@ public class Absorb {
         double c1 = crossSec(freq, Constants.LINE1_C02_EINSTEIN_A , Constants.LINE1_CO2_WN, Constants.LINE1_CO2_MULTIPLICITY, Constants.LINE1_CO2_WIDTH, Constants.LINE1_CO2_NAIR);
         double c2 = crossSec(freq,Constants.LINE2_CO2_EINSTEIN_A , Constants.LINE2_CO2_WN, Constants.LINE2_CO2_MULTIPLICITY, Constants.LINE2_CO2_WIDTH, Constants.LINE2_CO2_WIDTH);
         double c3 = crossSec(freq, Constants.LINE3_CO2_EINSTEIN_A, Constants.LINE3_CO2_WN, Constants.LINE3_CO2_MULTIPLICITY, Constants.LINE3_CO2_WIDTH, Constants.LINE3_CO2_WIDTH);
-        return Math.exp(heightStep*concentration*(c1+c2+c3));
+        return Math.exp(-heightStep*concentration*(c1+c2+c3));
     }
 
     public static double absorbH02(double concentration, double freq, double height, double heightStep){

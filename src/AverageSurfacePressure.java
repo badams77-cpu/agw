@@ -2,11 +2,12 @@ import java.io.PrintWriter;
 
 public class AverageSurfacePressure {
 
+    public static double AVERAGE_PRESS = 101325.0;
 
     // For now we code constant pressure, but the table can take varying Pressure by Latitude
     private PressPoint[] inputTable = {
-        new PressPoint(-90.0, 101325),
-        new PressPoint(90.0, 101325)
+        new PressPoint(-90.0, 101325.0),
+        new PressPoint(90.0, 101325.0)
     };
 
     public double pressureAtLatitude(double lat){

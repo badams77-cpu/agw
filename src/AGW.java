@@ -9,10 +9,10 @@ public class AGW {
     double freqNum;
     static double freqMax = 1e14 ;
     static double freqMin = 2e11;
-    static int freqSteps = 1000;
+    static int freqSteps = 10000;
 
 
-    public static double CO2CONC = 400/1000000;
+    public static double CO2CONC = 400.0/(1000000.0*AverageSurfacePressure.AVERAGE_PRESS);
 
     public static void  calc(){
 
