@@ -7,9 +7,10 @@ public class AGW {
     static int NheightStep = maxHeight/heightStep;
     static int latitudeSteps = 100;
     double freqNum;
-    static double freqMax = 1e14 ;
-    static double freqMin = 2e11;
-    static int freqSteps = 10000;
+    static double freqMax = 3e14 ;
+    //static double freqMin = 2e11;
+    static double freqMin = 6.5e13;
+    static int freqSteps = 1000;
 
 
     public static double CO2CONC = 400.0/(1000000.0*AverageSurfacePressure.AVERAGE_PRESS);
@@ -31,12 +32,15 @@ public class AGW {
                 double P = BarometricFormula.pressureByHeight(P0, T0, height);
                 double T = BarometricFormula.tempByHeight(T0, height);
                 double concH20 = WaterVapourDensity.molarDensity(T, P);
+                if (concH20>10){
+                    System.out.println("x");
+                }
                 double absorb = groundintensity*Absorb.absorbH02(concH20, freq, height , (double) heightStep );
                 return absorb;
             }
         };
 
-        DoubFunction innerMostC20 = new DoubFunction(){
+        DoubFunction innerMostCO2 = new DoubFunction(){
             // absortPerHeight
 
             double evalInner( double height,  double params[]  ){
@@ -45,8 +49,8 @@ public class AGW {
                 double T0 = params[2];
                 double groundintensity = params[3];
                 double P = BarometricFormula.pressureByHeight(P0, T0, height);
-//                double T = BarometricFormula.tempByHeight(T0, height);
-                double concC02 = P*CO2CONC;
+                double T = BarometricFormula.tempByHeight(T0, height);
+                double concC02 = P*CO2CONC/(Constants.GAS_CONSTANT*T);
                 double absorb = groundintensity*Absorb.absorbC02(concC02, freq, height , (double) heightStep );
                 return absorb;
             }
@@ -57,8 +61,8 @@ public class AGW {
                 double P0 = params[0];
                 double T0 = params[1];
                 double intensity = PlanckLaw.planck(freq, T0);
-                innerMostC20.setParams(freq, P0, T0, intensity);
-                return SimpsonsRule.integrate(0, maxHeight, NheightStep, innerMostC20);
+                innerMostCO2.setParams(freq, P0, T0, intensity);
+                return SimpsonsRule.integrate(0, maxHeight, NheightStep, innerMostCO2);
             }
         };
 

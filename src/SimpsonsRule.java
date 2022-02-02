@@ -4,7 +4,7 @@ public class SimpsonsRule {
         double h = (b - a) / (N - 1);     // step size
         double fa = f.eval(a);
         double fb = f.eval(b);
-        if (Double.isNaN(fa)){
+        if (Double.isNaN(fa) ){
           System.err.println(f.getClass().getName() + "IS NaN at "+a);
         }
         if (Double.isNaN(fb)){
