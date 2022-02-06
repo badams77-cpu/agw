@@ -50,6 +50,8 @@ public class Constants {
     public static double RADIUS_EARTH = 6371000.0d;
     public static double ACCELERATION_DUE_TO_GRAVITY = 9.80665d;
     public static double AIR_MOLAR_MASS = 28.97e-3d;
+    public static double CO2_MOLECULAR_WEIGHT = 44.01d;
+    public static double H2O_MOLECULAR_WEIGHT = 18.015d;
     public static double EARTH_AVERAGE_RELATIVE_HUMIDITY = 0.7d;
     public static double WATER_MOLAR_MASS = 18.01528d;
 }
