@@ -1,15 +1,19 @@
 public abstract class DoubFunction {
 
-    private double[] extraParams;
+    private double[][] extraParams;
 
-    void setParams(double ...extraParams){
-        this.extraParams = extraParams;
+    void setNumberOfStep(int n){
+        extraParams = new double[n][];
     }
 
-    abstract double evalInner(double x, double params[]);
+    void setParams(int i, double ...extraParams){
+        this.extraParams[i] = extraParams;
+    }
 
-    public double eval(double x){
-        return evalInner(x, extraParams);
+    abstract double evalInner(double x, double params[], int i);
+
+    public double eval(double x, int i){
+        return evalInner(x, extraParams[i], i);
     }
 
 }

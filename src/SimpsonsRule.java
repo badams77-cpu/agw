@@ -20,7 +20,7 @@ public class SimpsonsRule {
             double mul1 = mul;
             pool.execute( () -> {
                 double x = a + h * ii;
-                double fi = f.eval(x);
+                double fi = f.eval(x,ii);
                 if (Double.isNaN(fi) ){
                     System.err.println(f.getClass().getName() + "IS NaN at "+x);
                 }
@@ -39,8 +39,8 @@ public class SimpsonsRule {
 
     public static double integrate(double a, double b, int N, DoubFunction f) {         // precision parameter
         double h = (b - a) / (N - 1);     // step size
-        double fa = f.eval(a);
-        double fb = f.eval(b);
+        double fa = f.eval(a,0);
+        double fb = f.eval(b, N-1);
         if (Double.isNaN(fa) ){
           System.err.println(f.getClass().getName() + "IS NaN at "+a);
         }
@@ -54,7 +54,7 @@ public class SimpsonsRule {
         // 4/3 terms
         for (int i = 1; i < N - 1; i += 2) {
             double x = a + h * i;
-            double fx = f.eval(x);
+            double fx = f.eval(x,i);
             if (Double.isNaN(fx)){
                 System.err.println(f.getClass().getName() + "IS NaN at "+x);
             }
@@ -64,7 +64,7 @@ public class SimpsonsRule {
         // 2/3 terms
         for (int i = 2; i < N - 1; i += 2) {
             double x = a + h * i;
-            double fx = f.eval(x);
+            double fx = f.eval(x,i);
             if (Double.isNaN(fx)){
                 System.err.println(f.getClass().getName() + "IS NaN at "+x);
             }
@@ -76,8 +76,7 @@ public class SimpsonsRule {
 
     public static double integrateConsecutive(double a, double b, int N, DoubFunction f) {         // precision parameter
         double h = (b - a) / (N - 1);     // step size
-        double fa = f.eval(a);
-
+        double fa = f.eval(a,0);
         if (Double.isNaN(fa) ){
             System.err.println(f.getClass().getName() + "IS NaN at "+a);
         }
@@ -90,7 +89,7 @@ public class SimpsonsRule {
         boolean isOdd = true;
         for (int i = 1; i < N - 1; i += 1) {
             double x = a + h * i;
-            double fx = f.eval(x);
+            double fx = f.eval(x,i);
             if (Double.isNaN(fx)){
                 System.err.println(f.getClass().getName() + "IS NaN at "+x);
             }
@@ -103,7 +102,7 @@ public class SimpsonsRule {
         }
 
 
-        double fb = f.eval(b);
+        double fb = f.eval(b, N-1);
         if (Double.isNaN(fb)){
             System.err.println(f.getClass().getName() + "IS NaN at "+b);
         }
@@ -115,7 +114,7 @@ public class SimpsonsRule {
     public static void main(String args[]){
         DoubFunction func = new DoubFunction() {
             @Override
-            double evalInner(double x, double[] params) {
+            double evalInner(double x, double[] params, int i) {
                 return 1.0-x*x;
             }
         };

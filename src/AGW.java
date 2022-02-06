@@ -7,7 +7,7 @@ public class AGW {
     static int NheightStep = maxHeight/heightStep;
     static int latitudeSteps = 200;
     double freqNum;
-    static double freqMax = 3e14 ;
+    static double freqMax = 9e14 ;
     //static double freqMin = 2e11;
     static double freqMin = 2e11;
     static int freqSteps = 10000;
@@ -24,7 +24,7 @@ public class AGW {
         DoubFunction innerMostH20 = new DoubFunction(){
             // absortPerHeight
 
-            double evalInner( double height,  double params[]  ){
+            double evalInner( double height,  double params[]  , int i){
                 double freq = params[0];
                 double P0 = params[1];
                 double T0 = params[2];
@@ -43,7 +43,7 @@ public class AGW {
         DoubFunction innerMostCO2 = new DoubFunction(){
             // absortPerHeight
 
-            double evalInner( double height,  double params[]  ){
+            double evalInner( double height,  double params[] , int i ){
                 double freq = params[0];
                 double P0 = params[1];
                 double T0 = params[2];
@@ -59,53 +59,61 @@ public class AGW {
             }
         };
 
-        DoubFunction absorpsOverHeightC02 = new DoubFunction(){
-            double evalInner( double freq,  double params[]  ) {
-                double P0 = params[0];
-                double T0 = params[1];
-                double intensity = PlanckLaw.planck(freq, T0);
-                innerMostCO2.setParams(freq, P0, T0, intensity);
-                return SimpsonsRule.integrateConsecutive(0, maxHeight, NheightStep, innerMostCO2);
-            }
-        };
+
 
         DoubFunction absorpsOverHeightH20 = new DoubFunction(){
-            double evalInner( double freq,  double params[]  ) {
+            double evalInner( double freq,  double params[] ,int i) {
                 double P0 = params[0];
                 double T0 = params[1];
                 double intensity = PlanckLaw.planck(freq, T0);
-                innerMostH20.setParams(freq, P0, T0, intensity);
+                innerMostH20.setParams(i, freq, P0, T0, intensity);
                 return SimpsonsRule.integrateConsecutive(0, maxHeight, NheightStep, innerMostH20);
             }
         };
 
+        DoubFunction absorpsOverHeightC02 = new DoubFunction(){
+            double evalInner( double freq,  double params[] , int i ) {
+                double P0 = params[0];
+                double T0 = params[1];
+                double intensity = PlanckLaw.planck(freq, T0);
+                innerMostCO2.setParams(i, freq, P0, T0, intensity);
+                return SimpsonsRule.integrateConsecutive(0, maxHeight, NheightStep, innerMostCO2);
+            }
+        };
+
         DoubFunction totalAbsorbOverFreqC02 = new DoubFunction() {
+
             @Override
-            double evalInner(double x, double[] params) {
+            double evalInner(double x, double[] params, int i) {
                 double lat = x*90/Math.PI;
                 double P0 = asp.pressureAtLatitude(lat);
                 double T0 = ast.tempAtLatitude(lat);
-                absorpsOverHeightC02.setParams(  P0, T0);
-                return Constants.RADIUS_EARTH*Constants.RADIUS_EARTH*2*Math.cos(x)*
+                System.out.println(i);
+                absorpsOverHeightC02.setParams(  i,P0, T0);
+                return Constants.RADIUS_EARTH*Constants.RADIUS_EARTH*2.0*Math.cos(x)*
                         SimpsonsRule.integrateThreaded(freqMin, freqMax, freqSteps, absorpsOverHeightC02);
             }
         };
 
         DoubFunction totalAbsorbOverFreqH20 = new DoubFunction() {
             @Override
-            double evalInner(double x, double[] params) {
+            double evalInner(double x, double[] params, int i) {
                 double lat = x*90/Math.PI;
                 double P0 = asp.pressureAtLatitude(lat);
                 double T0 = ast.tempAtLatitude(lat);
-
-                absorpsOverHeightH20.setParams(  P0, T0);
-                return Constants.RADIUS_EARTH*Constants.RADIUS_EARTH*2*Math.cos(x)*SimpsonsRule.integrateThreaded(freqMin, freqMax, freqSteps, absorpsOverHeightH20);
+                absorpsOverHeightH20.setParams(  i, P0, T0);
+                return Constants.RADIUS_EARTH*Constants.RADIUS_EARTH*2.0*Math.cos(x)
+                        *SimpsonsRule.integrateThreaded(freqMin, freqMax, freqSteps, absorpsOverHeightH20);
             }
         };
 
-
+        totalAbsorbOverFreqC02.setNumberOfStep(latitudeSteps);
+        absorpsOverHeightC02.setNumberOfStep(freqSteps);
+        innerMostCO2.setNumberOfStep(heightStep);
         double totalAbsorbC02 = SimpsonsRule.integrate(-Math.PI, Math.PI, latitudeSteps, totalAbsorbOverFreqC02);
-
+        totalAbsorbOverFreqH20.setNumberOfStep(latitudeSteps);
+        absorpsOverHeightH20.setNumberOfStep(freqSteps);
+        innerMostH20.setNumberOfStep(heightStep);
         double totalAbsorbH20 = SimpsonsRule.integrate(-Math.PI, Math.PI, latitudeSteps, totalAbsorbOverFreqH20);
         double ratio = totalAbsorbC02/ totalAbsorbH20;
 
