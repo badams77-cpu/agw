@@ -1,6 +1,41 @@
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicReference;
+
 public class SimpsonsRule {
 
     private static double third = 1.0/3.0;
+
+    private static int THREADS = 16;
+
+    public static double integrateThreaded(double a, double b, int N, DoubFunction f) {         // precision parameter
+        double h = (b - a) / (N - 1);     // step size
+        ForkJoinPool pool = new ForkJoinPool(THREADS);
+       AtomicDouble sum = new AtomicDouble();
+        boolean isOdd = false;
+        for(int i=0; i<N; i++){
+            int ii = i;
+            double mul = isOdd? 2*third: 4*third;
+            if (i==0) { mul = third; }
+            if (i==N-1){ mul = third; }
+            double mul1 = mul;
+            pool.execute( () -> {
+                double x = a + h * ii;
+                double fi = f.eval(x);
+                if (Double.isNaN(fi) ){
+                    System.err.println(f.getClass().getName() + "IS NaN at "+x);
+                }
+                sum.getAndAdd(mul1*fi);
+            });
+            isOdd = !isOdd;
+        }
+        try {
+            pool.shutdown();
+            if (!pool.awaitTermination(1, TimeUnit.HOURS)){
+                pool.shutdownNow();
+            }
+        } catch (Exception e){}
+        return sum.getAndAdd(0.0) * h;
+    }
 
     public static double integrate(double a, double b, int N, DoubFunction f) {         // precision parameter
         double h = (b - a) / (N - 1);     // step size
@@ -39,7 +74,7 @@ public class SimpsonsRule {
         return sum * h;
     }
 
-    public static double integrateConsective(double a, double b, int N, DoubFunction f) {         // precision parameter
+    public static double integrateConsecutive(double a, double b, int N, DoubFunction f) {         // precision parameter
         double h = (b - a) / (N - 1);     // step size
         double fa = f.eval(a);
 
@@ -77,4 +112,31 @@ public class SimpsonsRule {
         return sum * h;
     }
 
+    public static void main(String args[]){
+        DoubFunction func = new DoubFunction() {
+            @Override
+            double evalInner(double x, double[] params) {
+                return 1.0-x*x;
+            }
+        };
+        double consec = integrateConsecutive(-1,1, 1000, func);
+        double standard = integrate(-1,1,1000,func);
+        double thread = integrateThreaded(-1,1,1000, func);
+        System.out.println("Standard Integrator: "+standard);
+        System.out.println("Consecutive Integrator: "+consec);
+        System.out.println("threaded Integrator: "+thread);
+    }
+
+}
+
+class AtomicDouble {
+    private AtomicReference<Double> value = new AtomicReference(Double.valueOf(0.0));
+    double getAndAdd(double delta) {
+        while (true) {
+            Double currentValue = value.get();
+            Double newValue = Double.valueOf(currentValue.doubleValue() + delta);
+            if (value.compareAndSet(currentValue, newValue))
+                return currentValue.doubleValue();
+        }
+    }
 }

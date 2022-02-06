@@ -2,15 +2,15 @@ import java.util.function.DoubleFunction;
 
 public class AGW {
 
-    static int heightStep = 100;
+    static int heightStep = 250;
     static int maxHeight = 25000;
     static int NheightStep = maxHeight/heightStep;
-    static int latitudeSteps = 100;
+    static int latitudeSteps = 200;
     double freqNum;
     static double freqMax = 3e14 ;
     //static double freqMin = 2e11;
-    static double freqMin = 6.5e13;
-    static int freqSteps = 1000;
+    static double freqMin = 2e11;
+    static int freqSteps = 10000;
 
 
     public static double CO2CONC = 418.0/(1000000.0*AverageSurfacePressure.AVERAGE_PRESS);
@@ -65,7 +65,7 @@ public class AGW {
                 double T0 = params[1];
                 double intensity = PlanckLaw.planck(freq, T0);
                 innerMostCO2.setParams(freq, P0, T0, intensity);
-                return SimpsonsRule.integrateConsective(0, maxHeight, NheightStep, innerMostCO2);
+                return SimpsonsRule.integrateConsecutive(0, maxHeight, NheightStep, innerMostCO2);
             }
         };
 
@@ -75,7 +75,7 @@ public class AGW {
                 double T0 = params[1];
                 double intensity = PlanckLaw.planck(freq, T0);
                 innerMostH20.setParams(freq, P0, T0, intensity);
-                return SimpsonsRule.integrateConsective(0, maxHeight, NheightStep, innerMostH20);
+                return SimpsonsRule.integrateConsecutive(0, maxHeight, NheightStep, innerMostH20);
             }
         };
 
@@ -86,8 +86,8 @@ public class AGW {
                 double P0 = asp.pressureAtLatitude(lat);
                 double T0 = ast.tempAtLatitude(lat);
                 absorpsOverHeightC02.setParams(  P0, T0);
-                return Constants.RADIUS_EARTH*2*Math.cos(x)*
-                        SimpsonsRule.integrate(freqMin, freqMax, freqSteps, absorpsOverHeightC02);
+                return Constants.RADIUS_EARTH*Constants.RADIUS_EARTH*2*Math.cos(x)*
+                        SimpsonsRule.integrateThreaded(freqMin, freqMax, freqSteps, absorpsOverHeightC02);
             }
         };
 
@@ -99,7 +99,7 @@ public class AGW {
                 double T0 = ast.tempAtLatitude(lat);
 
                 absorpsOverHeightH20.setParams(  P0, T0);
-                return Constants.RADIUS_EARTH*2*Math.cos(x)*SimpsonsRule.integrate(freqMin, freqMax, freqSteps, absorpsOverHeightH20);
+                return Constants.RADIUS_EARTH*Constants.RADIUS_EARTH*2*Math.cos(x)*SimpsonsRule.integrateThreaded(freqMin, freqMax, freqSteps, absorpsOverHeightH20);
             }
         };
 
