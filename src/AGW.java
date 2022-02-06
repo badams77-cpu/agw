@@ -66,8 +66,7 @@ public class AGW {
                 double P0 = params[0];
                 double T0 = params[1];
                 double intensity = PlanckLaw.planck(freq, T0);
-                innerMostH20.setParams(i, freq, P0, T0, intensity);
-                return SimpsonsRule.integrateConsecutive(0, maxHeight, NheightStep, innerMostH20);
+                return SimpsonsRule.integrateConsecutive(0, maxHeight, NheightStep, innerMostH20, freq, P0, T0, intensity);
             }
         };
 
@@ -76,8 +75,7 @@ public class AGW {
                 double P0 = params[0];
                 double T0 = params[1];
                 double intensity = PlanckLaw.planck(freq, T0);
-                innerMostCO2.setParams(i, freq, P0, T0, intensity);
-                return SimpsonsRule.integrateConsecutive(0, maxHeight, NheightStep, innerMostCO2);
+                return SimpsonsRule.integrateConsecutive(0, maxHeight, NheightStep, innerMostCO2, freq, P0, T0, intensity);
             }
         };
 
@@ -88,10 +86,8 @@ public class AGW {
                 double lat = x*90/Math.PI;
                 double P0 = asp.pressureAtLatitude(lat);
                 double T0 = ast.tempAtLatitude(lat);
-                System.out.println(i);
-                absorpsOverHeightC02.setParams(  i,P0, T0);
                 return Constants.RADIUS_EARTH*Constants.RADIUS_EARTH*2.0*Math.cos(x)*
-                        SimpsonsRule.integrateThreaded(freqMin, freqMax, freqSteps, absorpsOverHeightC02);
+                        SimpsonsRule.integrateThreaded(freqMin, freqMax, freqSteps, absorpsOverHeightC02, P0, T0);
             }
         };
 
@@ -101,19 +97,12 @@ public class AGW {
                 double lat = x*90/Math.PI;
                 double P0 = asp.pressureAtLatitude(lat);
                 double T0 = ast.tempAtLatitude(lat);
-                absorpsOverHeightH20.setParams(  i, P0, T0);
                 return Constants.RADIUS_EARTH*Constants.RADIUS_EARTH*2.0*Math.cos(x)
-                        *SimpsonsRule.integrateThreaded(freqMin, freqMax, freqSteps, absorpsOverHeightH20);
+                        *SimpsonsRule.integrateThreaded(freqMin, freqMax, freqSteps, absorpsOverHeightH20, P0, T0);
             }
         };
 
-        totalAbsorbOverFreqC02.setNumberOfStep(latitudeSteps);
-        absorpsOverHeightC02.setNumberOfStep(freqSteps);
-        innerMostCO2.setNumberOfStep(heightStep);
         double totalAbsorbC02 = SimpsonsRule.integrate(-Math.PI, Math.PI, latitudeSteps, totalAbsorbOverFreqC02);
-        totalAbsorbOverFreqH20.setNumberOfStep(latitudeSteps);
-        absorpsOverHeightH20.setNumberOfStep(freqSteps);
-        innerMostH20.setNumberOfStep(heightStep);
         double totalAbsorbH20 = SimpsonsRule.integrate(-Math.PI, Math.PI, latitudeSteps, totalAbsorbOverFreqH20);
         double ratio = totalAbsorbC02/ totalAbsorbH20;
 
