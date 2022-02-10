@@ -1,6 +1,5 @@
 public abstract class DoubFunction {
 
-    private double[][] extraParams;
 
     abstract double evalInner(double x, double params[], int i);
 

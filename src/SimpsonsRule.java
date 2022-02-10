@@ -1,3 +1,5 @@
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -11,14 +13,13 @@ public class SimpsonsRule {
         double h = (b - a) / (N - 1);     // step size
         ForkJoinPool pool = new ForkJoinPool(THREADS);
        AtomicDouble sum = new AtomicDouble();
-        boolean isOdd = false;
         for(int i=0; i<N; i++){
             int ii = i;
-            double mul = isOdd? 2*third: 4*third;
-            if (i==0) { mul = third; }
-            if (i==N-1){ mul = third; }
-            double mul1 = mul;
             pool.execute( () -> {
+                double mul = ii%2==0? 2*third: 4*third;
+                if (ii==0) { mul = third; }
+                if (ii==N-1){ mul = third; }
+                double mul1 = mul;
                 double x = a + h * ii;
                 double fi = f.eval(x,ii, params);
                 if (Double.isNaN(fi) ){
@@ -26,7 +27,6 @@ public class SimpsonsRule {
                 }
                 sum.getAndAdd(mul1*fi);
             });
-            isOdd = !isOdd;
         }
         try {
             pool.shutdown();
@@ -112,18 +112,35 @@ public class SimpsonsRule {
     }
 
     public static void main(String args[]){
+        // Roots of polynumerial to integrate
+        List<Number> in = Arrays.asList(-0.9, -0.8,-0.7, -0.6,-0.5, -0.4, -0.3, -0.2, -0.1, 0, .1,.2,.3,.4,.5, .6,.7, .8, .9 );
         DoubFunction func = new DoubFunction() {
             @Override
             double evalInner(double x, double[] params, int i) {
-                return 1.0-x*x;
+                return in.stream().map(y->y.doubleValue()-x).reduce(1.0,(a,b)->(a*b));
             }
         };
-        double consec = integrateConsecutive(-1,1, 1000, func);
-        double standard = integrate(-1,1,1000,func);
-        double thread = integrateThreaded(-1,1,1000, func);
-        System.out.println("Standard Integrator: "+standard);
-        System.out.println("Consecutive Integrator: "+consec);
-        System.out.println("threaded Integrator: "+thread);
+        double consec=0;
+        long startConsec = System.currentTimeMillis();
+        for(int i=1;i<1000; i++) {
+            consec = integrateConsecutive(-1, 1, 100000, func);
+        }
+        double timeConsec = (System.currentTimeMillis() - startConsec)/1000.0;
+        double standard=0;
+        long startStandard = System.currentTimeMillis();
+        for(int i=1; i<1000; i++) {
+                standard = integrate(-1,1,100000,func);
+        }
+        double timeStandard = (System.currentTimeMillis() - startStandard)/1000.0;
+        double threaded=0;
+        long startThreaded = System.currentTimeMillis();
+        for(int i=1;i<1000; i++) {
+            threaded = integrateThreaded(-1, 1, 100000, func);
+        }
+        double timeThreaded = (System.currentTimeMillis() - startThreaded)/1000.0;
+        System.out.println("Standard Integrator: "+standard+" time taken: "+timeStandard+" seconds");
+        System.out.println("Consecutive Integrator: "+consec+" time taken: "+timeConsec+" seconds");
+        System.out.println("threaded Integrator: "+threaded+" time taken: "+timeThreaded+" seconds");
     }
 
 }
