@@ -86,7 +86,7 @@ public class AGW {
                 double lat = x*90/Math.PI;
                 double P0 = asp.pressureAtLatitude(lat);
                 double T0 = ast.tempAtLatitude(lat);
-                return Constants.RADIUS_EARTH*Constants.RADIUS_EARTH*2.0*Math.cos(x)*
+                return 2.0*Math.PI*Constants.RADIUS_EARTH*Constants.RADIUS_EARTH*Math.cos(x)*
                         SimpsonsRule.integrateThreaded(freqMin, freqMax, freqSteps, absorpsOverHeightC02, P0, T0);
             }
         };
@@ -94,16 +94,16 @@ public class AGW {
         DoubFunction totalAbsorbOverFreqH20 = new DoubFunction() {
             @Override
             double evalInner(double x, double[] params, int i) {
-                double lat = x*90/Math.PI;
+                double lat = x*180/Math.PI;
                 double P0 = asp.pressureAtLatitude(lat);
                 double T0 = ast.tempAtLatitude(lat);
-                return Constants.RADIUS_EARTH*Constants.RADIUS_EARTH*2.0*Math.cos(x)
+                return 2.0*Math.PI*Constants.RADIUS_EARTH*Constants.RADIUS_EARTH*Math.cos(x)
                         *SimpsonsRule.integrateThreaded(freqMin, freqMax, freqSteps, absorpsOverHeightH20, P0, T0);
             }
         };
 
-        double totalAbsorbC02 = SimpsonsRule.integrate(-Math.PI, Math.PI, latitudeSteps, totalAbsorbOverFreqC02);
-        double totalAbsorbH20 = SimpsonsRule.integrate(-Math.PI, Math.PI, latitudeSteps, totalAbsorbOverFreqH20);
+        double totalAbsorbC02 = SimpsonsRule.integrate(-Math.PI/2.0, Math.PI/2.0, latitudeSteps, totalAbsorbOverFreqC02);
+        double totalAbsorbH20 = SimpsonsRule.integrate(-Math.PI/2.0, Math.PI/2.0, latitudeSteps, totalAbsorbOverFreqH20);
         double ratio = totalAbsorbC02/ totalAbsorbH20;
 
         System.out.println( "Total Absorption C02 "+totalAbsorbC02+"\n Total Absorption H20 "+totalAbsorbH20 + "\n Ratio "+ratio);
