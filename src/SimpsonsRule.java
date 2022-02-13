@@ -7,7 +7,7 @@ public class SimpsonsRule {
 
     private static double third = 1.0/3.0;
 
-    private static int THREADS = 16;
+    private static int THREADS = 1;
 
     public static double integrateThreaded(double a, double b, int N, DoubFunction f, double ...params) {         // precision parameter
         double h = (b - a) / (N - 1);     // step size

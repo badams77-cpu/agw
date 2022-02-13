@@ -1,16 +1,20 @@
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.function.DoubleFunction;
 
 public class AGW {
 
-    static int heightStep = 250;
-    static int maxHeight = 25000;
-    static int NheightStep = maxHeight/heightStep;
-    static int latitudeSteps = 200;
-    double freqNum;
-    static double freqMax = 9e14 ;
-    //static double freqMin = 2e11;
-    static double freqMin = 2e11;
-    static int freqSteps = 10000;
+    public static int heightStep = 10;
+    public static int maxHeight = 25000;
+    public static int NheightStep = maxHeight/heightStep;
+    public static int latitudeSteps = 100;
+    public static double freqMax = 5.0e14 ;
+    public static double freqMin = 2e11;
+    public static int freqSteps = 25000;
+
+    public static PrintWriter out;
 
 
     public static double CO2CONC = 418.0/(1000000.0*AverageSurfacePressure.AVERAGE_PRESS);
@@ -28,15 +32,11 @@ public class AGW {
                 double freq = params[0];
                 double P0 = params[1];
                 double T0 = params[2];
-                double lastIntensity = params[3];
                 double P = BarometricFormula.pressureByHeight(P0, T0, height);
                 double T = BarometricFormula.tempByHeight(T0, height);
                 double concH20 = WaterVapourDensity.molarDensity(T, P)/Constants.H2O_MOLECULAR_WEIGHT;
-                double exponent = Absorb.absorbH02(concH20, freq, T, height , (double) heightStep );
-                double attenuation = Math.exp(-exponent);
-                double absorb = lastIntensity*(1.0-attenuation);
-                params[3]=lastIntensity*attenuation;
-                return absorb;
+                return Absorb.absorbH02(concH20, freq, T, height , (double) heightStep );
+
             }
         };
 
@@ -51,22 +51,27 @@ public class AGW {
                 double P = BarometricFormula.pressureByHeight(P0, T0, height);
                 double T = BarometricFormula.tempByHeight(T0, height);
                 double concC02 = P*CO2CONC/(Constants.GAS_CONSTANT*T*Constants.CO2_MOLECULAR_WEIGHT);
-                double exponent = -Absorb.absorbC02(concC02, freq, T, height , (double) heightStep );
-                double attenuation = Math.exp(exponent);
-                double absorb = lastIntensity*(1.0-attenuation);
-                params[3]=lastIntensity*attenuation;
-                return absorb;
+                return Absorb.absorbC02(concC02, freq, T, height , (double) heightStep );
+
             }
         };
 
-
+        DoubFunction justPlank = new DoubFunction() {
+            @Override
+            double evalInner(double freq, double[] params, int i) {
+                double P0 = params[0];
+                double T0 = params[1];
+                double intensity = PlanckLaw.planck(freq, T0);
+                return intensity;
+            }
+        };
 
         DoubFunction absorpsOverHeightH20 = new DoubFunction(){
             double evalInner( double freq,  double params[] ,int i) {
                 double P0 = params[0];
                 double T0 = params[1];
                 double intensity = PlanckLaw.planck(freq, T0);
-                return SimpsonsRule.integrateConsecutive(0, maxHeight, NheightStep, innerMostH20, freq, P0, T0, intensity);
+                return intensity*Math.exp(-SimpsonsRule.integrateConsecutive(0, maxHeight, NheightStep, innerMostH20, freq, P0, T0, intensity));
             }
         };
 
@@ -75,7 +80,7 @@ public class AGW {
                 double P0 = params[0];
                 double T0 = params[1];
                 double intensity = PlanckLaw.planck(freq, T0);
-                return SimpsonsRule.integrateConsecutive(0, maxHeight, NheightStep, innerMostCO2, freq, P0, T0, intensity);
+                return intensity*Math.exp(-SimpsonsRule.integrateConsecutive(0, maxHeight, NheightStep, innerMostCO2, freq, P0, T0, intensity));
             }
         };
 
@@ -86,10 +91,23 @@ public class AGW {
                 double lat = x*90/Math.PI;
                 double P0 = asp.pressureAtLatitude(lat);
                 double T0 = ast.tempAtLatitude(lat);
-                return 2.0*Math.PI*Constants.RADIUS_EARTH*Constants.RADIUS_EARTH*Math.cos(x)*
-                        SimpsonsRule.integrateThreaded(freqMin, freqMax, freqSteps, absorpsOverHeightC02, P0, T0);
+                return 2.0*Math.PI*Constants.RADIUS_EARTH*Constants.RADIUS_EARTH*Math.cos(x)
+                        *SimpsonsRule.integrateThreaded(freqMin, freqMax, freqSteps, absorpsOverHeightC02, P0, T0);
             }
         };
+
+        DoubFunction totalOverPlanck = new DoubFunction() {
+
+            @Override
+            double evalInner(double x, double[] params, int i) {
+                double lat = x*90/Math.PI;
+                double P0 = asp.pressureAtLatitude(lat);
+                double T0 = ast.tempAtLatitude(lat);
+                return 2.0*Math.PI*Constants.RADIUS_EARTH*Constants.RADIUS_EARTH*Math.cos(x)
+                        *SimpsonsRule.integrateThreaded(freqMin, freqMax, freqSteps, justPlank, P0, T0);
+            }
+        };
+
 
         DoubFunction totalAbsorbOverFreqH20 = new DoubFunction() {
             @Override
@@ -103,14 +121,24 @@ public class AGW {
         };
 
         double totalAbsorbC02 = SimpsonsRule.integrate(-Math.PI/2.0, Math.PI/2.0, latitudeSteps, totalAbsorbOverFreqC02);
+        double totalPlanck = SimpsonsRule.integrate(-Math.PI/2.0, Math.PI/2.0, latitudeSteps, totalOverPlanck);
         double totalAbsorbH20 = SimpsonsRule.integrate(-Math.PI/2.0, Math.PI/2.0, latitudeSteps, totalAbsorbOverFreqH20);
         double ratio = totalAbsorbC02/ totalAbsorbH20;
 
         System.out.println( "Total Absorption C02 "+totalAbsorbC02+"\n Total Absorption H20 "+totalAbsorbH20 + "\n Ratio "+ratio);
+        System.out.println("Total Radiated Light "+totalPlanck);
     }
 
     public static void main(String argv[]){
-        calc();
+        try {
+            FileOutputStream fout = new FileOutputStream(new File("absorb1.csv"));
+            out = new PrintWriter(fout);
+            calc();
+          out.close();
+            fout.close();
+        } catch (IOException e){
+            e.printStackTrace(System.out);
+       }
     }
 
 }
