@@ -17,7 +17,7 @@ public class AGW {
     public static PrintWriter out;
 
 
-    public static double CO2CONC = 418.0/(1000000.0*AverageSurfacePressure.AVERAGE_PRESS);
+    public static double CO2CONC = 800.0/(1000000.0*AverageSurfacePressure.AVERAGE_PRESS);
 
     public static void  calc(){
 
