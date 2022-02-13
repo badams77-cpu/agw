@@ -71,7 +71,7 @@ public class AGW {
                 double P0 = params[0];
                 double T0 = params[1];
                 double intensity = PlanckLaw.planck(freq, T0);
-                return intensity*Math.exp(-SimpsonsRule.integrateConsecutive(0, maxHeight, NheightStep, innerMostH20, freq, P0, T0, intensity));
+                return intensity*(1.0-Math.exp(-SimpsonsRule.integrateConsecutive(0, maxHeight, NheightStep, innerMostH20, freq, P0, T0, intensity)));
             }
         };
 
@@ -80,7 +80,7 @@ public class AGW {
                 double P0 = params[0];
                 double T0 = params[1];
                 double intensity = PlanckLaw.planck(freq, T0);
-                return intensity*Math.exp(-SimpsonsRule.integrateConsecutive(0, maxHeight, NheightStep, innerMostCO2, freq, P0, T0, intensity));
+                return intensity*(1.0-Math.exp(-SimpsonsRule.integrateConsecutive(0, maxHeight, NheightStep, innerMostCO2, freq, P0, T0, intensity)));
             }
         };
 
