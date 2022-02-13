@@ -17,7 +17,7 @@ public class AGW {
     public static PrintWriter out;
 
 
-    public static double CO2CONC = 800.0/(1000000.0*AverageSurfacePressure.AVERAGE_PRESS);
+    public static double CO2CONC = 417/(1000000.0*AverageSurfacePressure.AVERAGE_PRESS);
 
     public static void  calc(){
 
@@ -164,7 +164,9 @@ public class AGW {
 
         System.out.println( "Total Absorption C02 "+totalAbsorbC02+"\n Total Absorption H20 "+totalAbsorbH20 + "\n Ratio "+ratio);
         System.out.println("Total Absorption Both "+totalAbsorbBoth);
+        System.out.println("Total Radiated Light At Surface"+(totalPlanck));
         System.out.println("Total Radiated Light "+(totalPlanck-totalAbsorbBoth));
+
     }
 
     public static void main(String argv[]){
