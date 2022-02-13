@@ -126,7 +126,7 @@ public class AGW {
         double ratio = totalAbsorbC02/ totalAbsorbH20;
 
         System.out.println( "Total Absorption C02 "+totalAbsorbC02+"\n Total Absorption H20 "+totalAbsorbH20 + "\n Ratio "+ratio);
-        System.out.println("Total Radiated Light "+totalPlanck);
+        System.out.println("Total Radiated Light "+(totalPlanck-totalAbsorbC02-totalAbsorbH20));
     }
 
     public static void main(String argv[]){
