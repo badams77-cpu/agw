@@ -56,6 +56,22 @@ public class AGW {
             }
         };
 
+        DoubFunction innerMostBoth = new DoubFunction(){
+            // absortPerHeight
+
+            double evalInner( double height,  double params[] , int i ){
+                double freq = params[0];
+                double P0 = params[1];
+                double T0 = params[2];
+                double P = BarometricFormula.pressureByHeight(P0, T0, height);
+                double T = BarometricFormula.tempByHeight(T0, height);
+                double concH20 = WaterVapourDensity.molarDensity(T, P)/Constants.H2O_MOLECULAR_WEIGHT;
+                double concC02 = P*CO2CONC/(Constants.GAS_CONSTANT*T*Constants.CO2_MOLECULAR_WEIGHT);
+                return Absorb.absorbBoth(concH20, concC02, freq, T, height , (double) heightStep );
+
+            }
+        };
+
         DoubFunction justPlank = new DoubFunction() {
             @Override
             double evalInner(double freq, double[] params, int i) {
@@ -81,6 +97,15 @@ public class AGW {
                 double T0 = params[1];
                 double intensity = PlanckLaw.planck(freq, T0);
                 return intensity*(1.0-Math.exp(-SimpsonsRule.integrateConsecutive(0, maxHeight, NheightStep, innerMostCO2, freq, P0, T0, intensity)));
+            }
+        };
+
+        DoubFunction absorpOverHeightBoth = new DoubFunction(){
+            double evalInner( double freq,  double params[] , int i ) {
+                double P0 = params[0];
+                double T0 = params[1];
+                double intensity = PlanckLaw.planck(freq, T0);
+                return intensity*(1.0-Math.exp(-SimpsonsRule.integrateConsecutive(0, maxHeight, NheightStep, innerMostBoth, freq, P0, T0, intensity)));
             }
         };
 
@@ -120,13 +145,26 @@ public class AGW {
             }
         };
 
+        DoubFunction totalAbsorbOverFreqBoth = new DoubFunction() {
+            @Override
+            double evalInner(double x, double[] params, int i) {
+                double lat = x*180/Math.PI;
+                double P0 = asp.pressureAtLatitude(lat);
+                double T0 = ast.tempAtLatitude(lat);
+                return 2.0*Math.PI*Constants.RADIUS_EARTH*Constants.RADIUS_EARTH*Math.cos(x)
+                        *SimpsonsRule.integrateThreaded(freqMin, freqMax, freqSteps, absorpOverHeightBoth, P0, T0);
+            }
+        };
+
         double totalAbsorbC02 = SimpsonsRule.integrate(-Math.PI/2.0, Math.PI/2.0, latitudeSteps, totalAbsorbOverFreqC02);
         double totalPlanck = SimpsonsRule.integrate(-Math.PI/2.0, Math.PI/2.0, latitudeSteps, totalOverPlanck);
         double totalAbsorbH20 = SimpsonsRule.integrate(-Math.PI/2.0, Math.PI/2.0, latitudeSteps, totalAbsorbOverFreqH20);
+        double totalAbsorbBoth = SimpsonsRule.integrate(-Math.PI/2.0, Math.PI/2.0, latitudeSteps, totalAbsorbOverFreqBoth);
         double ratio = totalAbsorbC02/ totalAbsorbH20;
 
         System.out.println( "Total Absorption C02 "+totalAbsorbC02+"\n Total Absorption H20 "+totalAbsorbH20 + "\n Ratio "+ratio);
-        System.out.println("Total Radiated Light "+(totalPlanck-totalAbsorbC02-totalAbsorbH20));
+        System.out.println("Total Absorption Both "+totalAbsorbBoth);
+        System.out.println("Total Radiated Light "+(totalPlanck-totalAbsorbBoth));
     }
 
     public static void main(String argv[]){
