@@ -164,7 +164,7 @@ public class AGW {
 
         System.out.println( "Total Absorption C02 "+totalAbsorbC02+"\n Total Absorption H20 "+totalAbsorbH20 + "\n Ratio "+ratio);
         System.out.println("Total Absorption Both "+totalAbsorbBoth);
-        System.out.println("Total Radiated Light At Surface"+(totalPlanck));
+        System.out.println("Total Radiated Light At Surface "+(totalPlanck));
         System.out.println("Total Radiated Light "+(totalPlanck-totalAbsorbBoth));
 
     }
