@@ -3,6 +3,7 @@ public class Constants {
     public static double PLANCKS = 6.626e-34d;
     public static double BOLTZMANN = 1.3864e-23d;
     public static double SPEED_OF_LIGHT = 299792458.0d;
+    public static double ATM_TO_PASCAL = 101325d;
     public static double SOLAR = 1360.8d;
     public static double WITTEMAN_WIDTH = 5.53d;
     public static double PASCAL_TO_TORR = 0.0075006168d;

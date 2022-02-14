@@ -35,7 +35,7 @@ public class AGW {
                 double P = BarometricFormula.pressureByHeight(P0, T0, height);
                 double T = BarometricFormula.tempByHeight(T0, height);
                 double concH20 = WaterVapourDensity.molarDensity(T, P)/Constants.H2O_MOLECULAR_WEIGHT;
-                return Absorb.absorbH02(concH20, freq, T, height , (double) heightStep );
+                return Absorb.absorbH02(concH20, freq, T, P,  height , (double) heightStep );
 
             }
         };
@@ -51,7 +51,7 @@ public class AGW {
                 double P = BarometricFormula.pressureByHeight(P0, T0, height);
                 double T = BarometricFormula.tempByHeight(T0, height);
                 double concC02 = P*CO2CONC/(Constants.GAS_CONSTANT*T*Constants.CO2_MOLECULAR_WEIGHT);
-                return Absorb.absorbC02(concC02, freq, T, height , (double) heightStep );
+                return Absorb.absorbC02(concC02, freq, T, P,  height , (double) heightStep );
 
             }
         };
@@ -67,7 +67,7 @@ public class AGW {
                 double T = BarometricFormula.tempByHeight(T0, height);
                 double concH20 = WaterVapourDensity.molarDensity(T, P)/Constants.H2O_MOLECULAR_WEIGHT;
                 double concC02 = P*CO2CONC/(Constants.GAS_CONSTANT*T*Constants.CO2_MOLECULAR_WEIGHT);
-                return Absorb.absorbBoth(concH20, concC02, freq, T, height , (double) heightStep );
+                return Absorb.absorbBoth(concH20, concC02, freq, T,P,  height , (double) heightStep );
 
             }
         };
