@@ -4,8 +4,7 @@ public class LorentzAbsorb {
 
     public static double sigma(double freq, double center, double width){
         double diff = freq-center;
-        double halfWidth = width/2.0;
-        return width/(twopi*( diff*diff + halfWidth*halfWidth));
+        return width/(Math.PI*( diff*diff + width*width));
     }
 
 }
