@@ -11,8 +11,8 @@ public class AGW {
     public static int NheightStep = maxHeight/heightStep;
     public static int latitudeSteps = 100;
     public static double freqMax = 5.0e14 ;
-    public static double freqMin = 2e11;
-    public static int freqSteps = 25000;
+    public static double freqMin = 1e13;
+    public static int freqSteps = 10000;
 
     public static PrintWriter out;
 
