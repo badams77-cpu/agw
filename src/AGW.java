@@ -10,14 +10,14 @@ public class AGW {
     public static int maxHeight = 25000;
     public static int NheightStep = maxHeight/heightStep;
     public static int latitudeSteps = 100;
-    public static double freqMax = 5.0e14 ;
-    public static double freqMin = 1e13;
-    public static int freqSteps = 10000;
+    public static double freqMax = 1.0e15 ;
+    public static double freqMin = 1e11;
+    public static int freqSteps = 50000;
 
     public static PrintWriter out;
 
 
-    public static double CO2CONC = 417/(1000000.0*AverageSurfacePressure.AVERAGE_PRESS);
+    public static double CO2CONC = 417/(1000000.0);
 
     public static void  calc(){
 
@@ -161,12 +161,17 @@ public class AGW {
         double totalAbsorbH20 = SimpsonsRule.integrate(-Math.PI/2.0, Math.PI/2.0, latitudeSteps, totalAbsorbOverFreqH20);
         double totalAbsorbBoth = SimpsonsRule.integrate(-Math.PI/2.0, Math.PI/2.0, latitudeSteps, totalAbsorbOverFreqBoth);
         double ratio = totalAbsorbC02/ totalAbsorbH20;
+        double areaEarth = 4.0*Math.PI*Constants.RADIUS_EARTH*Constants.RADIUS_EARTH;
 
         System.out.println( "Total Absorption C02 "+totalAbsorbC02+"\n Total Absorption H20 "+totalAbsorbH20 + "\n Ratio "+ratio);
         System.out.println("Total Absorption Both "+totalAbsorbBoth);
         System.out.println("Total Radiated Light At Surface "+(totalPlanck));
         System.out.println("Total Radiated Light "+(totalPlanck-totalAbsorbBoth));
-
+        System.out.println( "Total Absorption C02 per meter"+(totalAbsorbC02/areaEarth)+
+                "\n Total Absorption H20 per meter"+(totalAbsorbH20/areaEarth) + "\n Ratio "+ratio);
+        System.out.println("Total Absorption Both per meter"+(totalAbsorbBoth/areaEarth));
+        System.out.println("Total Radiated Light At Surface per meter "+(totalPlanck/areaEarth));
+        System.out.println("Total Radiated Light per meter "+((totalPlanck-totalAbsorbBoth)/areaEarth));
     }
 
     public static void main(String argv[]){
