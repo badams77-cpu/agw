@@ -17,7 +17,7 @@ public class AGW {
     public static PrintWriter out;
 
 
-    public static double CO2CONC = 417/(1000000.0);
+    public static double CO2CONC = 800.0/(1000000.0);
 
     public static void  calc(){
 
@@ -167,9 +167,9 @@ public class AGW {
         System.out.println("Total Absorption Both "+totalAbsorbBoth);
         System.out.println("Total Radiated Light At Surface "+(totalPlanck));
         System.out.println("Total Radiated Light "+(totalPlanck-totalAbsorbBoth));
-        System.out.println( "Total Absorption C02 per meter"+(totalAbsorbC02/areaEarth)+
-                "\n Total Absorption H20 per meter"+(totalAbsorbH20/areaEarth) + "\n Ratio "+ratio);
-        System.out.println("Total Absorption Both per meter"+(totalAbsorbBoth/areaEarth));
+        System.out.println( "Total Absorption C02 per meter "+(totalAbsorbC02/areaEarth)+
+                "\n Total Absorption H20 per meter "+(totalAbsorbH20/areaEarth) + "\n Ratio "+ratio);
+        System.out.println("Total Absorption Both per meter "+(totalAbsorbBoth/areaEarth));
         System.out.println("Total Radiated Light At Surface per meter "+(totalPlanck/areaEarth));
         System.out.println("Total Radiated Light per meter "+((totalPlanck-totalAbsorbBoth)/areaEarth));
     }
