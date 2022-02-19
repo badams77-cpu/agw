@@ -155,23 +155,28 @@ public class AGW {
                         *SimpsonsRule.integrateThreaded(freqMin, freqMax, freqSteps, absorpOverHeightBoth, P0, T0);
             }
         };
+        // Loop over parts per million of CO2
+        out.println("Parts per million C02, Absorb C02 Watts, Absorb H20 Watts, Absorb Both Watts");
+        for(int conc=100;conc<1200;conc+=100) {
+            CO2CONC = conc/1000000;
+            double totalAbsorbC02 = SimpsonsRule.integrate(-Math.PI / 2.0, Math.PI / 2.0, latitudeSteps, totalAbsorbOverFreqC02);
+            double totalPlanck = SimpsonsRule.integrate(-Math.PI / 2.0, Math.PI / 2.0, latitudeSteps, totalOverPlanck);
+            double totalAbsorbH20 = SimpsonsRule.integrate(-Math.PI / 2.0, Math.PI / 2.0, latitudeSteps, totalAbsorbOverFreqH20);
+            double totalAbsorbBoth = SimpsonsRule.integrate(-Math.PI / 2.0, Math.PI / 2.0, latitudeSteps, totalAbsorbOverFreqBoth);
+            double ratio = totalAbsorbC02 / totalAbsorbH20;
+            double areaEarth = 4.0 * Math.PI * Constants.RADIUS_EARTH * Constants.RADIUS_EARTH;
 
-        double totalAbsorbC02 = SimpsonsRule.integrate(-Math.PI/2.0, Math.PI/2.0, latitudeSteps, totalAbsorbOverFreqC02);
-        double totalPlanck = SimpsonsRule.integrate(-Math.PI/2.0, Math.PI/2.0, latitudeSteps, totalOverPlanck);
-        double totalAbsorbH20 = SimpsonsRule.integrate(-Math.PI/2.0, Math.PI/2.0, latitudeSteps, totalAbsorbOverFreqH20);
-        double totalAbsorbBoth = SimpsonsRule.integrate(-Math.PI/2.0, Math.PI/2.0, latitudeSteps, totalAbsorbOverFreqBoth);
-        double ratio = totalAbsorbC02/ totalAbsorbH20;
-        double areaEarth = 4.0*Math.PI*Constants.RADIUS_EARTH*Constants.RADIUS_EARTH;
-
-        System.out.println( "Total Absorption C02 "+totalAbsorbC02+"\n Total Absorption H20 "+totalAbsorbH20 + "\n Ratio "+ratio);
-        System.out.println("Total Absorption Both "+totalAbsorbBoth);
-        System.out.println("Total Radiated Light At Surface "+(totalPlanck));
-        System.out.println("Total Radiated Light "+(totalPlanck-totalAbsorbBoth));
-        System.out.println( "Total Absorption C02 per meter "+(totalAbsorbC02/areaEarth)+
-                "\n Total Absorption H20 per meter "+(totalAbsorbH20/areaEarth) + "\n Ratio "+ratio);
-        System.out.println("Total Absorption Both per meter "+(totalAbsorbBoth/areaEarth));
-        System.out.println("Total Radiated Light At Surface per meter "+(totalPlanck/areaEarth));
-        System.out.println("Total Radiated Light per meter "+((totalPlanck-totalAbsorbBoth)/areaEarth));
+            System.out.println("Total Absorption C02 " + totalAbsorbC02 + "\n Total Absorption H20 " + totalAbsorbH20 + "\n Ratio " + ratio);
+            System.out.println("Total Absorption Both " + totalAbsorbBoth);
+            System.out.println("Total Radiated Light At Surface " + (totalPlanck));
+            System.out.println("Total Radiated Light " + (totalPlanck - totalAbsorbBoth));
+            System.out.println("Total Absorption C02 per meter " + (totalAbsorbC02 / areaEarth) +
+                    "\n Total Absorption H20 per meter " + (totalAbsorbH20 / areaEarth) + "\n Ratio " + ratio);
+            System.out.println("Total Absorption Both per meter " + (totalAbsorbBoth / areaEarth));
+            System.out.println("Total Radiated Light At Surface per meter " + (totalPlanck / areaEarth));
+            System.out.println("Total Radiated Light per meter " + ((totalPlanck - totalAbsorbBoth) / areaEarth));
+            out.println(conc+","+  (totalAbsorbC02 / areaEarth)+","+(totalAbsorbH20 / areaEarth)+","+(totalAbsorbBoth / areaEarth));
+        }
     }
 
     public static void main(String argv[]){
