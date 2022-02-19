@@ -23,142 +23,142 @@ public class AGW {
 
         AverageSurfacePressure asp = new AverageSurfacePressure();
         AverageSurfaceTemperature ast = new AverageSurfaceTemperature();
-
-
-        DoubFunction innerMostH20 = new DoubFunction(){
-            // absortPerHeight
-
-            double evalInner( double height,  double params[]  , int i){
-                double freq = params[0];
-                double P0 = params[1];
-                double T0 = params[2];
-                double P = BarometricFormula.pressureByHeight(P0, T0, height);
-                double T = BarometricFormula.tempByHeight(T0, height);
-                double concH20 = WaterVapourDensity.molarDensity(T, P)/Constants.H2O_MOLECULAR_WEIGHT;
-                return Absorb.absorbH02(concH20, freq, T, P,  height , (double) heightStep );
-
-            }
-        };
-
-        DoubFunction innerMostCO2 = new DoubFunction(){
-            // absortPerHeight
-
-            double evalInner( double height,  double params[] , int i ){
-                double freq = params[0];
-                double P0 = params[1];
-                double T0 = params[2];
-                double lastIntensity = params[3];
-                double P = BarometricFormula.pressureByHeight(P0, T0, height);
-                double T = BarometricFormula.tempByHeight(T0, height);
-                double concC02 = P*CO2CONC/(Constants.GAS_CONSTANT*T*Constants.CO2_MOLECULAR_WEIGHT);
-                return Absorb.absorbC02(concC02, freq, T, P,  height , (double) heightStep );
-
-            }
-        };
-
-        DoubFunction innerMostBoth = new DoubFunction(){
-            // absortPerHeight
-
-            double evalInner( double height,  double params[] , int i ){
-                double freq = params[0];
-                double P0 = params[1];
-                double T0 = params[2];
-                double P = BarometricFormula.pressureByHeight(P0, T0, height);
-                double T = BarometricFormula.tempByHeight(T0, height);
-                double concH20 = WaterVapourDensity.molarDensity(T, P)/Constants.H2O_MOLECULAR_WEIGHT;
-                double concC02 = P*CO2CONC/(Constants.GAS_CONSTANT*T*Constants.CO2_MOLECULAR_WEIGHT);
-                return Absorb.absorbBoth(concH20, concC02, freq, T,P,  height , (double) heightStep );
-
-            }
-        };
-
-        DoubFunction justPlank = new DoubFunction() {
-            @Override
-            double evalInner(double freq, double[] params, int i) {
-                double P0 = params[0];
-                double T0 = params[1];
-                double intensity = PlanckLaw.planck(freq, T0);
-                return intensity;
-            }
-        };
-
-        DoubFunction absorpsOverHeightH20 = new DoubFunction(){
-            double evalInner( double freq,  double params[] ,int i) {
-                double P0 = params[0];
-                double T0 = params[1];
-                double intensity = PlanckLaw.planck(freq, T0);
-                return intensity*(1.0-Math.exp(-SimpsonsRule.integrateConsecutive(0, maxHeight, NheightStep, innerMostH20, freq, P0, T0, intensity)));
-            }
-        };
-
-        DoubFunction absorpsOverHeightC02 = new DoubFunction(){
-            double evalInner( double freq,  double params[] , int i ) {
-                double P0 = params[0];
-                double T0 = params[1];
-                double intensity = PlanckLaw.planck(freq, T0);
-                return intensity*(1.0-Math.exp(-SimpsonsRule.integrateConsecutive(0, maxHeight, NheightStep, innerMostCO2, freq, P0, T0, intensity)));
-            }
-        };
-
-        DoubFunction absorpOverHeightBoth = new DoubFunction(){
-            double evalInner( double freq,  double params[] , int i ) {
-                double P0 = params[0];
-                double T0 = params[1];
-                double intensity = PlanckLaw.planck(freq, T0);
-                return intensity*(1.0-Math.exp(-SimpsonsRule.integrateConsecutive(0, maxHeight, NheightStep, innerMostBoth, freq, P0, T0, intensity)));
-            }
-        };
-
-        DoubFunction totalAbsorbOverFreqC02 = new DoubFunction() {
-
-            @Override
-            double evalInner(double x, double[] params, int i) {
-                double lat = x*90/Math.PI;
-                double P0 = asp.pressureAtLatitude(lat);
-                double T0 = ast.tempAtLatitude(lat);
-                return 2.0*Math.PI*Constants.RADIUS_EARTH*Constants.RADIUS_EARTH*Math.cos(x)
-                        *SimpsonsRule.integrateThreaded(freqMin, freqMax, freqSteps, absorpsOverHeightC02, P0, T0);
-            }
-        };
-
-        DoubFunction totalOverPlanck = new DoubFunction() {
-
-            @Override
-            double evalInner(double x, double[] params, int i) {
-                double lat = x*90/Math.PI;
-                double P0 = asp.pressureAtLatitude(lat);
-                double T0 = ast.tempAtLatitude(lat);
-                return 2.0*Math.PI*Constants.RADIUS_EARTH*Constants.RADIUS_EARTH*Math.cos(x)
-                        *SimpsonsRule.integrateThreaded(freqMin, freqMax, freqSteps, justPlank, P0, T0);
-            }
-        };
-
-
-        DoubFunction totalAbsorbOverFreqH20 = new DoubFunction() {
-            @Override
-            double evalInner(double x, double[] params, int i) {
-                double lat = x*180/Math.PI;
-                double P0 = asp.pressureAtLatitude(lat);
-                double T0 = ast.tempAtLatitude(lat);
-                return 2.0*Math.PI*Constants.RADIUS_EARTH*Constants.RADIUS_EARTH*Math.cos(x)
-                        *SimpsonsRule.integrateThreaded(freqMin, freqMax, freqSteps, absorpsOverHeightH20, P0, T0);
-            }
-        };
-
-        DoubFunction totalAbsorbOverFreqBoth = new DoubFunction() {
-            @Override
-            double evalInner(double x, double[] params, int i) {
-                double lat = x*180/Math.PI;
-                double P0 = asp.pressureAtLatitude(lat);
-                double T0 = ast.tempAtLatitude(lat);
-                return 2.0*Math.PI*Constants.RADIUS_EARTH*Constants.RADIUS_EARTH*Math.cos(x)
-                        *SimpsonsRule.integrateThreaded(freqMin, freqMax, freqSteps, absorpOverHeightBoth, P0, T0);
-            }
-        };
-        // Loop over parts per million of CO2
         out.println("Parts per million C02, Absorb C02 Watts, Absorb H20 Watts, Absorb Both Watts");
         for(int conc=100;conc<1200;conc+=100) {
-            CO2CONC = conc/1000000;
+            CO2CONC = conc/1000000.0;
+
+            DoubFunction innerMostH20 = new DoubFunction(){
+                // absortPerHeight
+
+                double evalInner( double height,  double params[]  , int i){
+                    double freq = params[0];
+                    double P0 = params[1];
+                    double T0 = params[2];
+                    double P = BarometricFormula.pressureByHeight(P0, T0, height);
+                    double T = BarometricFormula.tempByHeight(T0, height);
+                    double concH20 = WaterVapourDensity.molarDensity(T, P)/Constants.H2O_MOLECULAR_WEIGHT;
+                    return Absorb.absorbH02(concH20, freq, T, P,  height , (double) heightStep );
+
+                }
+            };
+
+            DoubFunction innerMostCO2 = new DoubFunction(){
+                // absortPerHeight
+
+                double evalInner( double height,  double params[] , int i ){
+                    double freq = params[0];
+                    double P0 = params[1];
+                    double T0 = params[2];
+                    double lastIntensity = params[3];
+                    double P = BarometricFormula.pressureByHeight(P0, T0, height);
+                    double T = BarometricFormula.tempByHeight(T0, height);
+                    double concC02 = P*CO2CONC/(Constants.GAS_CONSTANT*T*Constants.CO2_MOLECULAR_WEIGHT);
+                    return Absorb.absorbC02(concC02, freq, T, P,  height , (double) heightStep );
+
+                }
+            };
+
+            DoubFunction innerMostBoth = new DoubFunction(){
+                // absortPerHeight
+
+                double evalInner( double height,  double params[] , int i ){
+                    double freq = params[0];
+                    double P0 = params[1];
+                    double T0 = params[2];
+                    double P = BarometricFormula.pressureByHeight(P0, T0, height);
+                    double T = BarometricFormula.tempByHeight(T0, height);
+                    double concH20 = WaterVapourDensity.molarDensity(T, P)/Constants.H2O_MOLECULAR_WEIGHT;
+                    double concC02 = P*CO2CONC/(Constants.GAS_CONSTANT*T*Constants.CO2_MOLECULAR_WEIGHT);
+                    return Absorb.absorbBoth(concH20, concC02, freq, T,P,  height , (double) heightStep );
+
+                }
+            };
+
+            DoubFunction justPlank = new DoubFunction() {
+                @Override
+                double evalInner(double freq, double[] params, int i) {
+                    double P0 = params[0];
+                    double T0 = params[1];
+                    double intensity = PlanckLaw.planck(freq, T0);
+                    return intensity;
+                }
+            };
+
+            DoubFunction absorpsOverHeightH20 = new DoubFunction(){
+                double evalInner( double freq,  double params[] ,int i) {
+                    double P0 = params[0];
+                    double T0 = params[1];
+                    double intensity = PlanckLaw.planck(freq, T0);
+                    return intensity*(1.0-Math.exp(-SimpsonsRule.integrateConsecutive(0, maxHeight, NheightStep, innerMostH20, freq, P0, T0, intensity)));
+                }
+            };
+
+            DoubFunction absorpsOverHeightC02 = new DoubFunction(){
+                double evalInner( double freq,  double params[] , int i ) {
+                    double P0 = params[0];
+                    double T0 = params[1];
+                    double intensity = PlanckLaw.planck(freq, T0);
+                    return intensity*(1.0-Math.exp(-SimpsonsRule.integrateConsecutive(0, maxHeight, NheightStep, innerMostCO2, freq, P0, T0, intensity)));
+                }
+            };
+
+            DoubFunction absorpOverHeightBoth = new DoubFunction(){
+                double evalInner( double freq,  double params[] , int i ) {
+                    double P0 = params[0];
+                    double T0 = params[1];
+                    double intensity = PlanckLaw.planck(freq, T0);
+                    return intensity*(1.0-Math.exp(-SimpsonsRule.integrateConsecutive(0, maxHeight, NheightStep, innerMostBoth, freq, P0, T0, intensity)));
+                }
+            };
+
+            DoubFunction totalAbsorbOverFreqC02 = new DoubFunction() {
+
+                @Override
+                double evalInner(double x, double[] params, int i) {
+                    double lat = x*90/Math.PI;
+                    double P0 = asp.pressureAtLatitude(lat);
+                    double T0 = ast.tempAtLatitude(lat);
+                    return 2.0*Math.PI*Constants.RADIUS_EARTH*Constants.RADIUS_EARTH*Math.cos(x)
+                            *SimpsonsRule.integrateThreaded(freqMin, freqMax, freqSteps, absorpsOverHeightC02, P0, T0);
+                }
+            };
+
+            DoubFunction totalOverPlanck = new DoubFunction() {
+
+                @Override
+                double evalInner(double x, double[] params, int i) {
+                    double lat = x*90/Math.PI;
+                    double P0 = asp.pressureAtLatitude(lat);
+                    double T0 = ast.tempAtLatitude(lat);
+                    return 2.0*Math.PI*Constants.RADIUS_EARTH*Constants.RADIUS_EARTH*Math.cos(x)
+                            *SimpsonsRule.integrateThreaded(freqMin, freqMax, freqSteps, justPlank, P0, T0);
+                }
+            };
+
+
+            DoubFunction totalAbsorbOverFreqH20 = new DoubFunction() {
+                @Override
+                double evalInner(double x, double[] params, int i) {
+                    double lat = x*180/Math.PI;
+                    double P0 = asp.pressureAtLatitude(lat);
+                    double T0 = ast.tempAtLatitude(lat);
+                    return 2.0*Math.PI*Constants.RADIUS_EARTH*Constants.RADIUS_EARTH*Math.cos(x)
+                            *SimpsonsRule.integrateThreaded(freqMin, freqMax, freqSteps, absorpsOverHeightH20, P0, T0);
+                }
+            };
+
+            DoubFunction totalAbsorbOverFreqBoth = new DoubFunction() {
+                @Override
+                double evalInner(double x, double[] params, int i) {
+                    double lat = x*180/Math.PI;
+                    double P0 = asp.pressureAtLatitude(lat);
+                    double T0 = ast.tempAtLatitude(lat);
+                    return 2.0*Math.PI*Constants.RADIUS_EARTH*Constants.RADIUS_EARTH*Math.cos(x)
+                            *SimpsonsRule.integrateThreaded(freqMin, freqMax, freqSteps, absorpOverHeightBoth, P0, T0);
+                }
+            };
+            // Loop over parts per million of CO2
+
             double totalAbsorbC02 = SimpsonsRule.integrate(-Math.PI / 2.0, Math.PI / 2.0, latitudeSteps, totalAbsorbOverFreqC02);
             double totalPlanck = SimpsonsRule.integrate(-Math.PI / 2.0, Math.PI / 2.0, latitudeSteps, totalOverPlanck);
             double totalAbsorbH20 = SimpsonsRule.integrate(-Math.PI / 2.0, Math.PI / 2.0, latitudeSteps, totalAbsorbOverFreqH20);
