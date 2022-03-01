@@ -38,12 +38,12 @@ public class Constants {
     public static double LINE2_H20_NAIR = 0.71d;
     public static double LINE3_H20_WN = 3779.49d;
     public static double LINE3_H20_EINSTEIN_A = 28.98d;
-    public static double LINE3_H20_WIDTH = 0.1049d;
+    public static double LINE3_H20_WIDTH = 0.1038d;
     public static double LINE3_H20_MULTIPLICITY = 3;
     public static double LINE3_H20_NAIR = 0.74d;
     public static double LINE4_H20_WN = 3693.29d;
     public static double LINE4_H20_EINSTEIN_A = 1.031d;
-    public static double LINE4_H20_WIDTH = 0.1038d;
+    public static double LINE4_H20_WIDTH = 0.1049d;
     public static double LINE4_H20_MULTIPLICITY = 3;
     public static double LINE4_H20_NAIR = 0.74d;
     public static double AIR_INTERNAL_ENERGY_PER_KT = 5.0d/2.0d;
