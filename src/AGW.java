@@ -24,7 +24,7 @@ public class AGW {
         AverageSurfacePressure asp = new AverageSurfacePressure();
         AverageSurfaceTemperature ast = new AverageSurfaceTemperature();
         out.println("Parts per million C02, Absorb C02 Watts, Absorb H20 Watts, Absorb Both Watts");
-        for(int conc=100;conc<1200;conc+=100) {
+        for(int conc=100;conc<1300;conc+=100) {
             CO2CONC = conc/1000000.0;
 
             DoubFunction innerMostH20 = new DoubFunction(){
